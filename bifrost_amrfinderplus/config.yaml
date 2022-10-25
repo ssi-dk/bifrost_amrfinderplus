@@ -1,0 +1,102 @@
+#-Basic info----------------------------------------------------------------------------------------
+display_name: amrfinderplus
+name: &name amrfinderplus__v1_0_0
+version:
+  schema: ["v1_0_0"]
+  code: v1_0_0
+#---------------------------------------------------------------------------------------------------
+
+#-Details-------------------------------------------------------------------------------------------
+details:
+  target: [sample]
+  description: >
+    This preforms an alignment using blast against AMRFinderPlus DB. 
+    AMRFinderPlus finds acquired antimicrobial resistance genes and some point mutations in protein 
+    or assembled nucleotide sequences.
+#---------------------------------------------------------------------------------------------------
+
+#-Category info-------------------------------------------------------------------------------------
+category: [resistance]
+#---------------------------------------------------------------------------------------------------
+
+#-Install-------------------------------------------------------------------------------------------
+install:
+  path: # Set by install program
+  dockerfile: docker://ssidk/bifrost_amrfinderplus
+#---------------------------------------------------------------------------------------------------
+
+#-Options-------------------------------------------------------------------------------------------
+options:
+amrfinderplus_organism_option:
+  "Acinetobacter baummannii": [Acinetobacter_baumannii],
+  "Campylobacter coli": [Campylobacter],
+  "Campylobacter jejuni": [Campylobacter],
+  "C. difficile": [Clostridioides_difficile],
+  "Clostridioides difficile": [Clostridioides_difficile],
+  "Enterococcus faecalis": [Enterococcus_faecalis],
+  "Enterococcus faecium": [Enterococcus_faecium],
+  "Enterococcus hirae": [Enterococcus_faecium],
+  "E. coli": [Escherichia],
+  "Escherichia": [Escherichia],
+  "Shigella": [Escherichia],
+  "Klebsiella pneumoniae": [Klebsiella],
+  "Klebsiella aerogenes": [Klebsiella],
+  "Neisseria gonorrhea": [Neisseria],
+  "Neisseria meningitidis": [Neisseria],
+  "Pseudomonas aeruginosa": [Pseudomonas_aeruginosa],
+  "Salmonella": [Salmonella],
+  "Staphylococcus aureus": [Staphylococcus_aureus],
+  "Staphylococcus pseudintermedius": [Staphylococcus_pseudintermedius],
+  "Streptococcus agalactiae": [Streptococcus_agalactiae],
+  "Streptococcus pneumoniae": [Streptococcus_pneumoniae],
+  "Streptococcus pyogenes": [Streptococcus_pyogenes],
+  "Vibrio cholerae": [Vibrio_cholerae]
+#---------------------------------------------------------------------------------------------------
+
+#-Required resource files---------------------------------------------------------------------------
+resources:
+  amrfinderplus_db: "/bifrost/components/bifrost_amrfinderplus/resources/amrfinderplus_db"
+#---------------------------------------------------------------------------------------------------
+
+#-Requirements to run component---------------------------------------------------------------------
+requirements:
+  sample:
+    categories:
+      paired_reads:
+        summary:
+          data:
+          components:
+            assemblatron:
+              status: Success
+            whats_my_species:
+              status: Success
+
+#---------------------------------------------------------------------------------------------------
+
+#-DB Value changes (excluding component output)-----------------------------------------------------
+db_values_changes:
+  files: []
+  sample:
+    categories:
+      resistance:
+        summary:  # see sample_component summary
+        component:
+          _id: 
+          date:  # ObjectId
+    report:
+      resistance:
+        title: "Resistance"
+        info: *name
+        columns: 
+          - {id: "gene", name: "gene"}
+          - {id: "coverage", name: "%cov"}
+          - {id: "identity", name: "%id"}
+          - {id: "variants", name: "# of variants"}
+        data: []
+  sample_component:
+    summary:
+      genes: 
+    results:
+      amrfinderplus/data_yaml: {}
+
+#---------------------------------------------------------------------------------------------------
