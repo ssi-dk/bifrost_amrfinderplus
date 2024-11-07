@@ -1,9 +1,9 @@
 #-Basic info----------------------------------------------------------------------------------------
 display_name: amrfinderplus
-name: &name amrfinderplus__v1_0_0
+name: &name amrfinderplus__v1.0.0
 version:
-  schema: ["v1_0_0"]
-  code: v1_0_0
+  schema: ["v1.0.0"]
+  code: v1.0.0
 #---------------------------------------------------------------------------------------------------
 
 #-Details-------------------------------------------------------------------------------------------
@@ -32,12 +32,16 @@ amrfinderplus_organism_option:
   "Campylobacter coli": [Campylobacter],
   "Campylobacter jejuni": [Campylobacter],
   "C. difficile": [Clostridioides_difficile],
+  "C. diff": [Clostridioides_difficile],
+  "c. diff": [Clostridioides_difficile],
   "Clostridioides difficile": [Clostridioides_difficile],
   "Enterococcus faecalis": [Enterococcus_faecalis],
   "Enterococcus faecium": [Enterococcus_faecium],
   "Enterococcus hirae": [Enterococcus_faecium],
   "E. coli": [Escherichia],
+  "e. coli": [Escherichia],
   "Escherichia": [Escherichia],
+  "Escherichia coli": [Escherichia],
   "Shigella": [Escherichia],
   "Klebsiella pneumoniae": [Klebsiella],
   "Klebsiella aerogenes": [Klebsiella],

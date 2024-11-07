@@ -1,24 +1,24 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 setup(
     name='bifrost_amrfinderplus',
-    version='v1_0_0',
+    version='1.0.0',
+    description='AMRfinder for Bifrost',
     url='https://github.com/ssi-dk/bifrost_amrfinderplus',
 
     # Author details
-    author='Karen Loaiza',
-    author_email='kloc@ssi.dk',
+    author='Rasmus Henriksen',
+    author_email='raah@ssi.dk',
 
     # Choose your license
     license='MIT',
 
-    packages=find_packages(),
-    python_requires='>=3.6',
-
-    package_data={'bifrost_amrfinderplus': ['config.yaml', 'pipeline.smk']},
-    include_package_data=True,
-
+    packages=find_namespace_packages(),
     install_requires=[
-        'bifrostlib >= 2.0.11'
-    ]
+        'bifrostlib >= 2.0.11',
+        'biopython>=1.77'
+    ],
+    python_requires='>=3.6',
+    package_data={'bifrost_amrfinderplus': ['config.yaml', 'pipeline.smk']},
+    include_package_data=True
 )
