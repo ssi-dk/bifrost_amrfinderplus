@@ -135,7 +135,7 @@ def parse_and_run(args: List[str]) -> None:
                 print(pipeline_options)
             run_pipeline(pipeline_options)
     except Exception as e:
-        print(traceback.format_exc, file=sys.stderr)
+        raise
 
 
 def show_info() -> None:
@@ -149,17 +149,23 @@ def run_pipeline(args: argparse.Namespace) -> None:
             sample_var = f"sample_id={args.sample_id}"
         else:
             sample_var = f"sample_name={args.sample_name}"
-        command = f"cd {args.outdir}; snakemake --nolock --cores all -s {os.path.join(os.path.dirname(__file__),'pipeline.smk')} --config {sample_var} component_name={COMPONENT['name']}"
-        print(command)
+        
+        command = ["snakemake","-p","--nolock","--cores", "all",
+                   "-s", os.path.join(os.path.dirname(__file__),'pipeline.smk'),
+                   "--config", f"{sample_var}", f"component_name={COMPONENT['name']}"]
+        
+        print(" ".join(command))
         process: subprocess.Popen = subprocess.Popen(
             command,
             stdout=sys.stdout,
             stderr=sys.stderr,
-            shell=True
+            shell=False,
+            cwd=args.outdir
         )
         process.communicate()
-    except:
+    except Exception:
         print(traceback.format_exc())
+        raise
 
 
 def main(args = sys.argv):
