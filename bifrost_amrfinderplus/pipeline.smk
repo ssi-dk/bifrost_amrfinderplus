@@ -27,6 +27,7 @@ try:
     sample:Sample = Sample.load(sample_ref) # schema 2.1
     if sample is None:
         raise Exception("invalid sample passed")
+
     component_ref = ComponentReference(name=config['component_name'])
     component:Component = Component.load(reference=component_ref) # schema 2.1
     if component is None:
@@ -55,8 +56,6 @@ onerror:
     if samplecomponent['status'] == "Running":
         common.set_status_and_save(sample, samplecomponent, "Failure")
 
-
-
 rule all:
     input:
         # file is defined by datadump function
@@ -73,57 +72,50 @@ rule setup:
         samplecomponent['path'] = os.path.join(os.getcwd(), component['name'])
         samplecomponent.save()
 
-
-rule_name = "check_requirements"
 rule check_requirements:
     message:
-        f"Running step:{rule_name}"
+        f"Running step: check_requirements"
     log:
-        out_file = f"{component['name']}/log/{rule_name}.out.log",
-        err_file = f"{component['name']}/log/{rule_name}.err.log",
+        out_file = f"{component['name']}/log/check_requirements.out.log",
+        err_file = f"{component['name']}/log/check_requirements.err.log",
     benchmark:
-        f"{component['name']}/benchmarks/{rule_name}.benchmark"
+        f"{component['name']}/benchmarks/check_requirements.benchmark"
     input:
         folder = rules.setup.output.init_file,
     output:
         check_file = f"{component['name']}/requirements_met",
-    params:
-        samplecomponent
     run:
         if samplecomponent.has_requirements():
-            print('asdf')
+            print('opening requirements for components')
             with open(output.check_file, "w") as fh:
                 fh.write("")
 
 #- Templated section: end --------------------------------------------------------------------------
 
 #* Dynamic section: start **************************************************************************
-rule_name = "run_amrfinderplus_on_reads"
+
 rule run_amrfinderplus_on_reads:
     message:
-        f"Running step:{rule_name}"
+        f"Running step: run_amrfinderplus_on_reads"
     log:
-        out_file = f"{component['name']}/log/{rule_name}.out.log",
-        err_file = f"{component['name']}/log/{rule_name}.err.log",
+        out_file = f"{component['name']}/log/run_amrfinderplus_on_reads.out.log",
+        err_file = f"{component['name']}/log/run_amrfinderplus_on_reads.err.log",
     benchmark:
-        f"{component['name']}/benchmarks/{rule_name}.benchmark"
+        f"{component['name']}/benchmarks/run_amrfinderplus_on_reads.benchmark"
     input:
         rules.check_requirements.output.check_file,
         #reads = sample['categories']['paired_reads']['summary']['data']
         genome = os.path.join(assemblatron_path, "contigs.fasta")
     output:
         #amrfinderplus_results = directory(f"{component['name']}/amrfinderplus_results"),
-        tsv = f"{component['name']}/output.tsv",
-        fasta = f"{component['name']}/output.tsv",
-        report = f"{component['name']}/output.tsv",
+        amr_report = f"{component['name']}/{component['name']}_amr_report.tsv",
+        mut_report = f"{component['name']}/{component['name']}_mutation_report.tsv",
     params:
         amrfinderplus_db = component['resources']['amrfinderplus_db']
         threads = 4
         id = 0.9
         cov = 0.6
         org = species
-    #run:
-        #print(params.amrfinderplus_db)
+        id_name = sample.name
     shell:
-        #"run_amrfinderplus.py -db_res {params.amrfinderplus_db} -acq -k kma -ifq {input.reads[0]} {input.reads[1]} -o {output.amrfinderplus_results}"
-        "amrfinder --threads {params.threads} --plus --ident_min {params.id} --coverage_min {params.cov} --organism {params.org} --nucleotide {input.genome} --output {output.tsv} --nucleotide_output {output.fasta} --mutation_all {output.report}"
+        "amrfinder --nucleotide {input.genome} --name {params.id_name} --database {params.amrfinderplus_db} --threads {params.threads} --plus --ident_min {params.id} --coverage_min {params.cov} --organism {params.org} --output {output.amr_report} --mutation_all {output.mut_report}"
