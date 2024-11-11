@@ -16,6 +16,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+.egg-info/
 lib/
 lib64/
 parts/
@@ -138,3 +139,20 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Environment files (pip and conda)
+.env
+.venv/
+env/
+venv/
+*.conda
+*.condarc
+
+# IDE or editor files
+.vscode/
+.idea/
+*.swp
+
+# sequencing data
+*.fq*
+*.fastq*
