@@ -28,32 +28,32 @@ install:
 #-Options-------------------------------------------------------------------------------------------
 options:
 amrfinderplus_organism_option:
-  "Acinetobacter baummannii": [Acinetobacter_baumannii],
-  "Campylobacter coli": [Campylobacter],
-  "Campylobacter jejuni": [Campylobacter],
-  "C. difficile": [Clostridioides_difficile],
-  "C. diff": [Clostridioides_difficile],
-  "c. diff": [Clostridioides_difficile],
-  "Clostridioides difficile": [Clostridioides_difficile],
-  "Enterococcus faecalis": [Enterococcus_faecalis],
-  "Enterococcus faecium": [Enterococcus_faecium],
-  "Enterococcus hirae": [Enterococcus_faecium],
-  "E. coli": [Escherichia],
-  "e. coli": [Escherichia],
-  "Escherichia": [Escherichia],
-  "Escherichia coli": [Escherichia],
-  "Shigella": [Escherichia],
-  "Klebsiella pneumoniae": [Klebsiella],
-  "Klebsiella aerogenes": [Klebsiella],
-  "Neisseria gonorrhea": [Neisseria],
-  "Neisseria meningitidis": [Neisseria],
-  "Pseudomonas aeruginosa": [Pseudomonas_aeruginosa],
-  "Salmonella": [Salmonella],
-  "Staphylococcus aureus": [Staphylococcus_aureus],
-  "Staphylococcus pseudintermedius": [Staphylococcus_pseudintermedius],
-  "Streptococcus agalactiae": [Streptococcus_agalactiae],
-  "Streptococcus pneumoniae": [Streptococcus_pneumoniae],
-  "Streptococcus pyogenes": [Streptococcus_pyogenes],
+  "Acinetobacter baummannii": [Acinetobacter_baumannii]
+  "Campylobacter coli": [Campylobacter]
+  "Campylobacter jejuni": [Campylobacter]
+  "C. difficile": [Clostridioides_difficile]
+  "C. diff": [Clostridioides_difficile]
+  "c. diff": [Clostridioides_difficile]
+  "Clostridioides difficile": [Clostridioides_difficile]
+  "Enterococcus faecalis": [Enterococcus_faecalis]
+  "Enterococcus faecium": [Enterococcus_faecium]
+  "Enterococcus hirae": [Enterococcus_faecium]
+  "E. coli": [Escherichia]
+  "e. coli": [Escherichia]
+  "Escherichia": [Escherichia]
+  "Escherichia coli": [Escherichia]
+  "Shigella": [Escherichia]
+  "Klebsiella pneumoniae": [Klebsiella]
+  "Klebsiella aerogenes": [Klebsiella]
+  "Neisseria gonorrhea": [Neisseria]
+  "Neisseria meningitidis": [Neisseria]
+  "Pseudomonas aeruginosa": [Pseudomonas_aeruginosa]
+  "Salmonella": [Salmonella]
+  "Staphylococcus aureus": [Staphylococcus_aureus]
+  "Staphylococcus pseudintermedius": [Staphylococcus_pseudintermedius]
+  "Streptococcus agalactiae": [Streptococcus_agalactiae]
+  "Streptococcus pneumoniae": [Streptococcus_pneumoniae]
+  "Streptococcus pyogenes": [Streptococcus_pyogenes]
   "Vibrio cholerae": [Vibrio_cholerae]
 #---------------------------------------------------------------------------------------------------
 

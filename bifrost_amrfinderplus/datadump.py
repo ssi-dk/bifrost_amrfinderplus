@@ -1,57 +1,81 @@
-# from bifrostlib import common
-# from bifrostlib.datahandling import Sample
-# from bifrostlib.datahandling import SampleComponentReference
-# from bifrostlib.datahandling import SampleComponent
-# from bifrostlib.datahandling import Category
-# from typing import Dict
-# import os
-# import json
+from bifrostlib import common
+from bifrostlib.datahandling import (Category, Component, Sample,
+                                     SampleComponent, SampleComponentReference)
+from typing import Dict
+import os
+import csv
 
-# def extract_resistance(resistance: Category, results: Dict, component_name: str) -> None:
-#     file_name = "amrfinderplus_results/output.tsv"
-#     # file_key = common.json_key_cleaner(file_name)
-#     # file_path = os.path.join(component_name, file_name)
-#     # with open(file_path) as input:
-#     #     results_json = json.load(input)
-#     # results[file_key]={}
-#     # for gene in results_json['genes'].keys():
-    #     gene_obj = results_json['genes'][gene]
-    #     gene_dict={}
-    #     gene_dict['gene'] = gene_obj['name']
-    #     gene_dict['phenotype'] = ", ".join(gene_obj['phenotypes'])
-    #     gene_dict['point mutation'] = None # todo
-    #     resistance['summary']['genes'].append(gene_dict)
-    #     report_dict = {}
-    #     report_dict['gene'] = gene_obj['name']
-    #     report_dict['coverage'] = gene_obj['coverage']
-    #     report_dict['identity'] = gene_obj['identity']
-    #     report_dict['variants'] = None # todo
-    #     #print(resistance['summary'])
-    #     resistance['report']['data'].append(report_dict)
-    # results[file_key]['genes'] = resistance['summary']['genes']
+# Function to parse TSV file into a list of dictionaries
+def parse_tsv(file_name: str) -> list:
+    results = []
+    with open(file_name, mode='r') as file:
+        reader = csv.DictReader(file, delimiter='\t')
+        for row in reader:
+            results.append(row)
+    return results
 
+# Function to extract results from the TSV and load them into the serotype category
+def extract_results_from_tsv(AMRfinder_category: Category, results: Dict, file_name: str, category_type: str) -> None:
+    if category_type == "amr_report":
+        # Process AMR Report data
+        amr_results = parse_tsv(file_name)
+        AMRfinder_category["summary"]["amr"] = amr_results
+    elif category_type == "mutation_report":
+        # Process Mutation Report data
+        mutation_results = parse_tsv(file_name)
+        AMRfinder_category["summary"]["mutation"] = mutation_results
 
-# def datadump(samplecomponent_ref_json: Dict):
-#     samplecomponent_ref = SampleComponentReference(value=samplecomponent_ref_json)
-#     samplecomponent = SampleComponent.load(samplecomponent_ref)
-#     sample = Sample.load(samplecomponent.sample)
-#     resistance= samplecomponent.get_category("resistance")
-#     if resistance is None:
-#         resistance = Category(value={
-#                 "name": "resistance",
-#                 "component": {"id": samplecomponent["component"]["_id"], "name": samplecomponent["component"]["name"]},
-#                 "summary": {"genes":[]},
-#                 "report": {"data":[]}
-#             }
-#         )
-#     extract_resistance(resistance, samplecomponent["results"], samplecomponent["component"]["name"])
-#     samplecomponent.set_category(resistance)
-#     sample.set_category(resistance)
-#     common.set_status_and_save(sample, samplecomponent, "Success")
+# Main function to handle the datadump
+def datadump(input: object, output: object, samplecomponent_ref_json: Dict):
+    samplecomponent_ref = SampleComponentReference(value=samplecomponent_ref_json)
+    samplecomponent = SampleComponent.load(samplecomponent_ref)
+    sample = Sample.load(samplecomponent.sample)
     
-#     with open(os.path.join(samplecomponent["component"]["name"], "datadump_complete"), "w+") as fh:
-#         fh.write("done")
+    # Get the serotype category or create a new one
+    AMRfinder_category = sample.get_category("AMRfinder_category")
+    if AMRfinder_category is None:
+        AMRfinder_category = Category(value={
+            "name": "bifrost_amrfinder",
+            "component": samplecomponent.component,
+            "summary": {
+                "amr": [],
+                "mutation": [],
+            },
+            "report": {}
+        })
 
-# datadump(
-#     snakemake.params.samplecomponent_ref_json,
-# )
+    # Assuming the input provides paths to amr_report.tsv and mutation_report.tsv
+    extract_results_from_tsv(
+        AMRfinder_category,
+        samplecomponent["results"],
+        input.amr_report_file,
+        category_type="amr_report"
+    )
+    
+    extract_results_from_tsv(
+        AMRfinder_category,
+        samplecomponent["results"],
+        input.mutation_report_file,
+        category_type="mutation_report"
+    )
+
+       # Save the results in the sample and samplecomponent
+    samplecomponent.set_category(AMRfinder_category)
+    sample.set_category(AMRfinder_category)
+    samplecomponent.save_files()
+    common.set_status_and_save(sample, samplecomponent, "Success")
+    
+    # Mark the completion of the datadump step
+    pprint(output.complete)
+    with open(output.complete[0], "w+") as fh:
+        fh.write("done")
+
+# Assuming `input` has mutation_report and amr_report, `output` has complete, and `params` provides the reference JSON
+datadump(
+    snakemake.input,
+    snakemake.output,
+    snakemake.params.samplecomponent_ref_json,
+)
+
+if __name__ == "__main__":
+    print("INSERT TEST EXAMPLES\n")

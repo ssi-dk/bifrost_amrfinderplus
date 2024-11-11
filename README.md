@@ -10,5 +10,7 @@ AMRFinderPlus finds acquired antimicrobial resistance genes and some point mutat
 git clone https://github.com/ssi-dk/bifrost_amrfinderplus
 cd bifrost_amrfinderplus
 bash install.sh -i LOCAL
-conda activate bifrost_sp_ecoli_vx.x.x
+conda activate bifrost_amrfinderplus_vx.x.x
+export BIFROST_INSTALL_DIR='/your/path/'
+BIFROST_DB_KEY="/your/key/here/" python -m bifrost_amrfinderplus -h
 ```

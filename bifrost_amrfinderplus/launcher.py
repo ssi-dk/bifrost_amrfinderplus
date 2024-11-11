@@ -26,8 +26,8 @@ def initialize():
     with open(os.path.join(os.path.dirname(__file__), 'config.yaml')) as fh:
         config: Dict = yaml.load(fh, Loader=yaml.FullLoader)
 
-    if not(datahandling.has_a_database_connection()):
-        raise ConnectionError("BIFROST_DB_KEY is not set or other connection error")
+    #if not(datahandling.has_a_database_connection()):
+    #    raise ConnectionError("BIFROST_DB_KEY is not set or other connection error")
 
     global COMPONENT
     try:
@@ -78,7 +78,7 @@ def parse_and_run(args: List[str]) -> None:
         f"-Environmental Variables/Defaults---------------\n"
         f"BIFROST_CONFIG_DIR: {os.environ.get('BIFROST_CONFIG_DIR','.')}\n"
         f"BIFROST_RUN_DIR: {os.environ.get('BIFROST_RUN_DIR','.')}\n"
-        f"BIFROST_DB_KEY: {os.environ.get('BIFROST_DB_KEY')}\n"
+        #f"BIFROST_DB_KEY: {os.environ.get('BIFROST_DB_KEY')}\n"
         f"------------------------------------------------\n"
         f"\n"
     )

@@ -127,28 +127,3 @@ rule run_amrfinderplus_on_reads:
     shell:
         #"run_amrfinderplus.py -db_res {params.amrfinderplus_db} -acq -k kma -ifq {input.reads[0]} {input.reads[1]} -o {output.amrfinderplus_results}"
         "amrfinder --threads {params.threads} --plus --ident_min {params.id} --coverage_min {params.cov} --organism {params.org} --nucleotide {input.genome} --output {output.tsv} --nucleotide_output {output.fasta} --mutation_all {output.report}"
-
-
-#* Dynamic section: end ****************************************************************************
-
-#- Templated section: start ------------------------------------------------------------------------
-rule_name = "datadump"
-rule datadump:
-    message:
-        f"Running step:{rule_name}"
-    log:
-        out_file = f"{component['name']}/log/{rule_name}.out.log",
-        err_file = f"{component['name']}/log/{rule_name}.err.log",
-    benchmark:
-        f"{component['name']}/benchmarks/{rule_name}.benchmark"
-    input:
-        #* Dynamic section: start ******************************************************************
-        rules.run_amrfinderplus_on_reads.output.amrfinderplus_results  # Needs to be output of final rule
-        #* Dynamic section: end ********************************************************************
-    output:
-        complete = rules.all.input
-    params:
-        samplecomponent_ref_json = samplecomponent.to_reference().json
-    script:
-        os.path.join(os.path.dirname(workflow.snakefile), "datadump.py")
-#- Templated section: end --------------------------------------------------------------------------
