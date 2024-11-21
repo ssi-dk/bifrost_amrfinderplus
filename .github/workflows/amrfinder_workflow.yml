@@ -1,4 +1,4 @@
-name: ecoli food bourne infection workflow
+name: AMRfinderplus workflow
 
 on:
   push:
@@ -24,17 +24,35 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Step 2: Extract version from __init__.py and set ENV_NAME
+      - name: Set ENV_NAME
+      run: |
+        VERSION=$(grep "__version__" bifrost_amrfinderplus/__init__.py | cut -d "'" -f 2)
+        REPO_NAME=$(basename "${{ github.workspace }}")
+        ENV_NAME="${REPO_NAME}_v${VERSION}"
+        # Echo the ENV_NAME to the log for debugging
+        echo "Setting ENV_NAME to: $ENV_NAME"
+        echo "ENV_NAME=$ENV_NAME" >> $GITHUB_ENV
+      
       # step 2 use environment.yml dependencies to create conda environment
       - name: Set up miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
           environment-file: environment.yml
-          activate-environment: amrfinder_pipeline
+          activate-environment: ${{ env.ENV_NAME }}
           python-version: ${{ matrix.python-version }}
 
-      # step 3
-      - name: Run test script
-        run: |
-          conda activate amrfinder_pipeline
-          make test
+      # Step 4: Build Docker image
+      - name: Build docker image
+      run: |
+        docker build --no-cache \
+        --build-arg CONDA_ENV_NAME="${{ env.ENV_NAME }}" \
+        -t bifrost_amrfinder_image .
+
+      - name: Run_tests
+      run: |
+        docker run \
+        --env CONDA_ENV_NAME="${{ env.ENV_NAME }}" \
+        bifrost_amrfinder_image \ 
+        bash -c "conda activate $CONDA_ENV_NAME && make test && make clean"
