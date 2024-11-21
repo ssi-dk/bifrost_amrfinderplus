@@ -7,9 +7,8 @@ FROM continuumio/miniconda3:latest
 WORKDIR /app
 
 # Install app dependencies and git necessary for submodules when using info from ecoli_fbi github repository
-RUN apt-get update && apt-get install -y git && \
+RUN apt-get update && apt-get install -y git build-essential make && \
     /opt/conda/bin/conda install -c conda-forge pytest
-
 RUN pip install bifrostlib
 
 # Copy the entire repository into the container
