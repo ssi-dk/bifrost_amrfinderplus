@@ -35,3 +35,10 @@ jobs:
           docker build --no-cache \
           --build-arg CONDA_ENV_NAME="${{ env.ENV_NAME }}" \
           -t bifrost_amrfinder_image .
+      
+      # step 4: Run docker image
+      - name: Run tests in docker
+        run: |
+          docker run \
+          --env CONDA_ENV_NAME="${{ env.ENV_NAME }}" \
+          bifrost_amrfinder_image
