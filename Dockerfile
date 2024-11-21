@@ -26,8 +26,6 @@ RUN /opt/conda/bin/conda init bash
 RUN bash install.sh -i LOCAL
 
 # Set environment variables
-ENV BIFROST_INSTALL_DIR='/app'
-# Use ARG for database key and set at runtime
 
 # Set the default command to run the Python module
-CMD ["bash", "-c", "conda run -n $CONDA_ENV_NAME python -m bifrost_amrfinderplus"]
+CMD ["bash", "-c", "conda run -n $CONDA_ENV_NAME && make test && make clean"]
