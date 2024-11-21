@@ -28,7 +28,8 @@ jobs:
           REPO_NAME==$(basename "${{ github.workspace }}")
           ENV_NAME="${REPO_NAME}_v${VERSION}"
           echo "Setting ENV_NAME to: $ENV_NAME"
-      
+          echo "ENV_NAME=${ENV_NAME}" >> $GITHUB_ENV
+
       # step 3: build docker image
       - name: Build Docker image
         run: |
