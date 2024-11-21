@@ -20,3 +20,18 @@ jobs:
       # step 1: checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
+      
+      # step 2: extract version from __init_.py and set ENV_NAME
+      - name: Set ENV_NAME
+        run: |
+          VERSION=$(grep "__version__" bifrost_amrfinderplus/__init__.py | cut -d "'" -f 2)
+          REPO_NAME==$(basename "${{ github.workspace }}")
+          ENV_NAME="${REPO_NAME}_v${VERSION}"
+          echo "Setting ENV_NAME to: $ENV_NAME"
+      
+      # step 3: build docker image
+      - name: Build Docker image
+        run: |
+          docker build --no-cache \
+          --build-arg CONDA_ENV_NAME="${{ env.ENV_NAME }}" \
+          -t bifrost_amrfinder_image .
