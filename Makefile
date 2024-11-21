@@ -12,7 +12,7 @@ test: testdata amrfinder_db_update amrfinder md5amrcheck
 testdata:
 # Suppress the command output but allow the echo to print when directory exists
 	@if [ ! -d "test/bifrost_test_data" ]; then \
-		cd test && git clone https://github.com/ssi-dk/bifrost_test_data > /dev/null 2>&1; \
+		cd test && git clone https://github.com/ssi-dk/bifrost_test_data; \
 	else \
 		echo "Directory test/bifrost_test_data already exists, skipping git clone."; \
 	fi

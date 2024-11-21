@@ -14,7 +14,7 @@ COPY . .
 
 # Copy the install.sh and environment.yml into the container
 COPY install.sh .
-#COPY environment.yml .
+COPY environment.yml .
 
 # Ensure install.sh is executable
 RUN chmod +x install.sh
@@ -28,4 +28,4 @@ RUN bash install.sh -i LOCAL
 # Set environment variables
 
 # Set the default command to run the Python module
-CMD ["bash", "-c", "conda run -n $CONDA_ENV_NAME && make test && make clean"]
+CMD ["bash", "-c", "make test && make clean"]

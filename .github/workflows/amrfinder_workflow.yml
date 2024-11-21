@@ -54,5 +54,5 @@ jobs:
       run: |
         docker run \
         --env CONDA_ENV_NAME="${{ env.ENV_NAME }}" \
-        bifrost_amrfinder_image \ 
+        bifrost_amrfinder_image \
         bash -c "conda activate $CONDA_ENV_NAME && make test && make clean"
