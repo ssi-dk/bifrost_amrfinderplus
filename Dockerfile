@@ -7,7 +7,10 @@ FROM continuumio/miniconda3:latest
 WORKDIR /app
 
 # Install app dependencies and git necessary for submodules when using info from ecoli_fbi github repository
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git && \
+    /opt/conda/bin/conda install -c conda-forge pytest
+
+RUN pip install bifrostlib
 
 # Copy the entire repository into the container
 COPY . .
@@ -25,7 +28,9 @@ RUN /opt/conda/bin/conda init bash
 # Install the tool using the install script
 RUN bash install.sh -i LOCAL
 
-# Set environment variables
+# Set environment variable for Conda environment name
+ARG CONDA_ENV_NAME=""
+ENV CONDA_ENV_NAME="${CONDA_ENV_NAME}"
 
 # Set the default command to run the Python module
-CMD ["bash", "-c", "make test && make clean"]
+CMD ["/bin/bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate ${CONDA_ENV_NAME} && make test && make clean"]

@@ -1,0 +1,42 @@
+# Secret files and resources
+.secret*
+resources/*
+
+# Python cache files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE or editor files
+.vscode/
+.idea/
+*.swp
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Log and temporary files
+*.log
+*.tmp
+*.temp
+
+# Environment files (pip and conda)
+.env
+.venv/
+env/
+venv/
+*.conda
+*.condarc
+
+# Distribution / packaging files
+bin/
+.Python
+build/
+dist/
+lib/
+lib64/
+*.egg-info/
