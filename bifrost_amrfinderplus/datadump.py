@@ -66,7 +66,7 @@ def datadump(input: object, output: object, samplecomponent_ref_json: Dict):
     common.set_status_and_save(sample, samplecomponent, "Success")
     
     # Mark the completion of the datadump step
-    pprint(output.complete)
+    print(output.complete)
     with open(output.complete[0], "w+") as fh:
         fh.write("done")
 
@@ -76,6 +76,3 @@ datadump(
     snakemake.output,
     snakemake.params.samplecomponent_ref_json,
 )
-
-if __name__ == "__main__":
-    print("INSERT TEST EXAMPLES\n")
