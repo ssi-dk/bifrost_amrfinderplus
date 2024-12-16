@@ -3,9 +3,9 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - snakemake-minimal==5.7.1
+  - snakemake-minimal==8.10.6
   - ncbi-amrfinderplus
-  - python>=3.6
+  - python>=3.11
   - git
   - pip
   - pip:
