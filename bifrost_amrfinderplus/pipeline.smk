@@ -12,19 +12,6 @@ from bifrostlib.datahandling import SampleComponentReference
 from bifrostlib.datahandling import SampleComponent
 os.umask(0o2)
 
-<<<<<<< HEAD
-=======
-# To get the species from what's my species component.
-#sample = Sample.load(samplecomponent.sample)
-#species_detection = sample.get_category("species_detection")
-#species = species_detection["summary"].get("species", None)
-# Code to run
-#if species not in component["options"]["mlst_species_mapping"]:
-#    run_cmd(f"touch {component['name']}/no_mlst_species_DB")
-#else:
-#    species = component["options"]["mlst_species_mapping"][species]
-
->>>>>>> computerome changes
 try:
     sample_ref = SampleReference(_id=config.get('sample_id', None), name=config.get('sample_name', None))
     sample:Sample = Sample.load(sample_ref)  # schema 2.1
@@ -42,7 +29,7 @@ try:
         raise Exception("invalid component passed")
 
     samplecomponent_ref = SampleComponentReference(name=SampleComponentReference.name_generator(sample.to_reference(), component.to_reference()))
-    samplecomponent = SampleComponent.load(samplecomponent_ref)							       
+    samplecomponent = SampleComponent.load(samplecomponent_ref)								            
 
     if samplecomponent is None:
         print(f"Creating new sample component: {samplecomponent_ref}")
@@ -130,20 +117,11 @@ rule run_amrfinderplus_on_assembly:
         amr_report = f"{component['name']}/{component['name']}_amr_report.txt",
         mut_report = f"{component['name']}/{component['name']}_mutation_report.txt",
     params:
-<<<<<<< HEAD
         threads = 1,
         id = 0.9,
         cov = 0.6,
         org = species_sp,
         sample_id = sample_id,
-=======
-        amrfinderplus_db = component['resources']['amrfinderplus_db'],
-        threads = 4,
-        id = 0.9,
-        cov = 0.6,
-        org = species,
-        id_name = sample.name,
->>>>>>> computerome changes
     shell:
         """
         amrfinder --nucleotide {input.assembly} --organism {params.org} --name {params.sample_id} --mutation_all {output.mut_report} --plus --print_node --report_all_equal --output {output.amr_report} 1> {log.out_file} 2> {log.err_file}
@@ -171,4 +149,3 @@ rule datadump:
     script:
         f"{resources_dir}/bifrost_amrfinderplus/datadump.py"
 #- Templated section: end --------------------------------------------------------------------------
-
