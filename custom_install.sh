@@ -35,6 +35,7 @@ if ! conda env list | grep -q "$ENV_NAME"; then
     exit 1
 fi
 
+
 CONDA_ENV_PATH=$(conda env list|awk '{print $2}' | grep -v '^$'|grep "$ENV_NAME")
 
 echo "Activating conda environment"
@@ -42,7 +43,15 @@ echo "Activating conda environment"
 conda activate $ENV_NAME
 
 AMR_DB_UPDATE_SCRIPT="$CONDA_ENV_PATH/bin/amrfinder_update"
-AMR_DB_PATH = "$CONDA_ENV_PATH/share/amrfinderplus/data"
+echo "update script $AMR_DB_UPDATE_SCRIPT"
+
+$CONDA_ENV_PATH/bin/amrfinder_update -d $CONDA_ENV_PATH/share/amrfinderplus/data 
+echo "$CONDA_ENV_PATH"
+echo "$CONDA_ENV_PATH/share/amrfinderplus/data"
+
+#exit_function
+#AMR_DB_PATH = "$CONDA_ENV_PATH/share/amrfinderplus/data"
+#echo "update script $AMR_DB_PATH"
 
 #checks if file exist and is executable
 if [ ! -x "$AMR_DB_UPDATE_SCRIPT" ]; then
@@ -51,7 +60,7 @@ if [ ! -x "$AMR_DB_UPDATE_SCRIPT" ]; then
 fi
 
 echo "Updating AMR database with $AMR_DB_UPDATE_SCRIPT"
-$AMR_DB_UPDATE_SCRIPT -d $AMR_DB_PATH 
+#$AMR_DB_UPDATE_SCRIPT -d $AMR_DB_PATH 
 
 echo "Updating AMR database is complete"
 
