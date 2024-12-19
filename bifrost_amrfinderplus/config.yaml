@@ -69,11 +69,11 @@ requirements:
       paired_reads:
         summary:
           data:
-          components:
-            assemblatron:
-              status: Success
-            whats_my_species:
-              status: Success
+    components:
+      assemblatron:
+        status: Success
+      whats_my_species:
+        status: Success
 
 #---------------------------------------------------------------------------------------------------
 

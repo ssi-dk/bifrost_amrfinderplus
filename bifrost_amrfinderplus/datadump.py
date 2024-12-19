@@ -36,7 +36,7 @@ def datadump(input: object, output: object, samplecomponent_ref_json: Dict):
     if AMRfinder_category is None:
         AMRfinder_category = Category(value={
             "name": "bifrost_amrfinder",
-            "component": samplecomponent.component,
+            "component": {"id": samplecomponent["component"]["_id"], "name": samplecomponent["component"]["name"]},
             "summary": {
                 "amr": [],
                 "mutation": [],
