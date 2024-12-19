@@ -35,6 +35,7 @@ amrfinderplus_organism_option:
   "C. diff": [Clostridioides_difficile]
   "c. diff": [Clostridioides_difficile]
   "Clostridioides difficile": [Clostridioides_difficile]
+  "Clostridioides": [Clostridioides_difficile]
   "Enterococcus faecalis": [Enterococcus_faecalis]
   "Enterococcus faecium": [Enterococcus_faecium]
   "Enterococcus hirae": [Enterococcus_faecium]
