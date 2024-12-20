@@ -26,7 +26,6 @@ install:
 #---------------------------------------------------------------------------------------------------
 
 #-Options-------------------------------------------------------------------------------------------
-options:
 amrfinderplus_organism_option:
   "Acinetobacter baummannii": [Acinetobacter_baumannii]
   "Campylobacter coli": [Campylobacter]

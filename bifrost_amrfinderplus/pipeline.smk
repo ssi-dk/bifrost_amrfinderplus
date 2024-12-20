@@ -2,6 +2,7 @@
 import os
 import sys
 import traceback
+import yaml
 
 from bifrostlib import common
 from bifrostlib.datahandling import SampleReference
@@ -19,6 +20,12 @@ try:
     species_detection = sample.get_category("species_detection")
     species = species_detection["summary"].get("species", None)
     species_sp = species.split()[0]
+    print(f"Species is {species} and species_sp is {species_sp}")
+
+    # Load organism options from the config
+    #config_file = f"{os.environ['BIFROST_INSTALL_DIR']}/bifrost/components/bifrost_{component['display_name']}/bifrost_{component['display_name']}/config.yaml"  # Adjust the path if necessary
+    #print(f" config file {config_file}")
+
     if sample is None:
         print("Sample is None!")	   
         raise Exception("invalid sample passed")
@@ -45,6 +52,46 @@ try:
     assemblatron_samplecomponent_ref = SampleComponentReference(name=SampleComponentReference.name_generator(sample.to_reference(), assemblatron_reference))
     assemblatron_samplecomponent = SampleComponent.load(assemblatron_samplecomponent_ref)
     assemblatron_path = assemblatron_samplecomponent['path']
+
+    #translate identified species to amrfinder appropriate values as defined in config file    
+    config_file = f"{os.environ['BIFROST_INSTALL_DIR']}/bifrost/components/bifrost_{component['display_name']}/bifrost_{component['display_name']}/config.yaml"  # Adjust the path if necessary
+    print(f" config file {config_file}")
+    with open(config_file, "r") as f:
+        try:
+            config_yaml = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            raise ValueError(f"Failed to parse YAML in '{config_file}': {e}")
+    
+    display_name = config_yaml.get("display_name")
+    #print(f"displau name {display_name}")
+    amrfinderplus_organism_options = config_yaml.get("amrfinderplus_organism_option")
+    #print("AMRFinderPlus Options:", amrfinderplus_organism_options)
+    
+    for key, value in amrfinderplus_organism_options.items():
+        #print(f"key: {key} and value: {value}")
+        if key.lower() == species_sp.lower():  #Case-insensitive match
+            organism_options = value
+            #print(f"key: {key} and value: {value} and species {species} and subspecies sp {species_sp}")
+            break
+    
+    if not organism_options:
+        raise Exception(f"Species '{species_sp}' is not recognized in the organism options.")
+
+    print(f"Matched species: {species_sp} -> Organism options: {organism_options}")
+    
+    # Save organism_options for Snakemake to use
+    config['organism_options'] = organism_options
+
+    #print(f"Species is {species} and species_sp is {species_sp}")
+
+    # Extract the organism options
+    #amrfinderplus_organism_option = config_yaml.get('options', {}).get('amrfinderplus_organism_option', {})
+    
+    #if not amrfinderplus_organism_option:
+    #    raise ValueError(f"Missing or empty 'amrfinderplus_organism_option' in '{config_file}'.")
+    #print(f"Successfully loaded organism options: {amrfinderplus_organism_option}")
+
+    #exit(1)
 
 except Exception as error:
     print(traceback.format_exc(), file=sys.stderr)
@@ -120,7 +167,7 @@ rule run_amrfinderplus_on_assembly:
         threads = 1,
         id = 0.9,
         cov = 0.6,
-        org = species_sp,
+        org = config['organism_options'],
         sample_id = sample_id,
     shell:
         """
