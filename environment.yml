@@ -13,6 +13,7 @@ dependencies:
       - pytest-cov
       - pytest-profiling
       - coverage 
+      - pyopenssl==24.3.0
       - pyyaml
       - argh
       - watchdog
