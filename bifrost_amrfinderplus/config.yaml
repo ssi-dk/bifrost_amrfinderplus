@@ -47,7 +47,6 @@ amrfinderplus_organism_option:
   "Salmonella": [Salmonella]
   "Salmonella enterica": [Salmonella]
   "Salmonella bongori": [Salmonella]
-  "Listeria monocytogenes": [Listeria_monocytogenes]
   "Clostridioides difficile": [Clostridioides_difficile]
 
 #---------------------------------------------------------------------------------------------------
