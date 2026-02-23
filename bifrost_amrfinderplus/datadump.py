@@ -66,10 +66,10 @@ def datadump(input: object, output: object, samplecomponent_ref_json: Dict):
     common.set_status_and_save(sample, samplecomponent, "Success")
     
     # Mark the completion of the datadump step
-    print(output.complete)
-    with open(output.complete[0], "w+") as fh:
+    with open(os.path.join(samplecomponent["component"]["name"], "datadump_complete"), "w+") as fh:
         fh.write("done")
 
+        
 # Assuming `input` has mutation_report and amr_report, `output` has complete, and `params` provides the reference JSON
 datadump(
     snakemake.input,
