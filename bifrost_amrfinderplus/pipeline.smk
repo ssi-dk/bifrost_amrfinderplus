@@ -11,6 +11,8 @@ from bifrostlib.datahandling import ComponentReference
 from bifrostlib.datahandling import Component
 from bifrostlib.datahandling import SampleComponentReference
 from bifrostlib.datahandling import SampleComponent
+from snakemake.io import directory
+import datetime
 
 os.umask(0o2)
 
@@ -63,7 +65,17 @@ rule all:
     run:
         common.set_status_and_save(sample, samplecomponent, "Success")
 
+rule set_time_start:
+    output:
+        start_file = f"{component['name']}/time_start.txt"
+    run:
+        import time
+        with open(output.start_file, "w") as fh:
+            fh.write(str(time.time()))
+
 rule setup:
+    input:
+        rules.set_time_start.output.start_file
     output:
         init_file = touch(f"{component['name']}/initialized")
     run:
@@ -80,7 +92,7 @@ rule check_requirements:
     benchmark:
         f"{component['name']}/benchmarks/{rule_name}.benchmark"
     input:
-        rules.setup.output.init_file
+        folder = rules.setup.output.init_file
     output:
         check_file = touch(f"{component['name']}/requirements_met")
     run:
@@ -126,8 +138,8 @@ def map_species_to_amrfinder(species, component):
 species = determine_species(sample, component)
 organism_option = map_species_to_amrfinder(species, component)
 
-rule_name = "run_amrfinderplus_on_assembly"
-rule run_amrfinderplus_on_assembly:
+rule_name = "run_amrfinderplus"
+rule run_amrfinderplus:
     message:
         f"Running step:{rule_name}"
     log:
@@ -137,10 +149,11 @@ rule run_amrfinderplus_on_assembly:
         f"{component['name']}/benchmarks/{rule_name}.benchmark"
     input:
         rules.check_requirements.output.check_file,
-        assembly = sample["categories"]["contigs"]["summary"]["data"]
+        contigs = sample["categories"]["contigs"]["summary"]["data"]
     output:
         amr_report = f"{component['name']}/{component['name']}_amr_report.txt",
-        mut_report = f"{component['name']}/{component['name']}_mutation_report.txt"
+        mut_report = f"{component['name']}/{component['name']}_mutation_report.txt",
+        tool_version = f"{component['name']}/tool_version.txt"
     params:
         org = organism_option,
         amrfinder_db = f"{os.environ['BIFROST_INSTALL_DIR']}{component['resources']['amrfinderplus_db']}/latest",
@@ -148,7 +161,7 @@ rule run_amrfinderplus_on_assembly:
     shell:
         r"""
         amrfinder \
-            --nucleotide {input.assembly} \
+            --nucleotide {input.contigs} \
             --organism {params.org} \
             --database {params.amrfinder_db} \
             --name {params.sample_name} \
@@ -158,9 +171,92 @@ rule run_amrfinderplus_on_assembly:
             --report_all_equal \
             --output {output.amr_report} \
             1> {log.out_file} 2> {log.err_file}
+
+        amrfinder --version > {output.tool_version} 2>&1
         """
 
 #* Dynamic section: end ****************************************************************************
+
+# -------------------------------------------------------------------------
+# END TIME + RUNTIME (FILE-BASED)
+# -------------------------------------------------------------------------
+
+rule set_time_end:
+    input:
+        rules.run_amrfinderplus.output.amr_report
+    output:
+        end_file = f"{component['name']}/time_end.txt"
+    run:
+        import time
+        with open(output.end_file, "w") as fh:
+            fh.write(str(time.time()))
+
+
+rule_name = "git_version"
+rule git_version:
+    message:
+        f"Running step:{rule_name}"
+    log:
+        out_file = f"{component['name']}/log/{rule_name}.out.log",
+        err_file = f"{component['name']}/log/{rule_name}.err.log",
+    benchmark:
+        f"{component['name']}/benchmarks/{rule_name}.benchmark"
+    input:
+        rules.setup.output.init_file
+    output:
+        git_hash = f"{component['name']}/git_hash.txt"
+    run:
+        import subprocess, os
+
+        snake_dir = os.path.dirname(workflow.snakefile)
+
+        try:
+            git_hash = subprocess.check_output(
+                ["git", "-C", snake_dir, "rev-parse", "HEAD"],
+                stderr=subprocess.STDOUT,
+                text=True
+            ).strip()
+        except Exception as e:
+            git_hash = "-"
+            os.makedirs(os.path.dirname(log.err_file), exist_ok=True)
+            with open(log.err_file, "a") as fh:
+                fh.write(f"[git_version] Could not determine git hash from {snake_dir}: {e}\n")
+
+        with open(output.git_hash, "w") as fh:
+            fh.write(str(git_hash))
+
+rule dump_info:
+    input:
+        start_file = rules.set_time_start.output.start_file,
+        end_file = rules.set_time_end.output.end_file,
+        tool_version = rules.run_amrfinderplus.output.tool_version,
+        git_hash = rules.git_version.output.git_hash
+    output:
+        runtime_flag = touch(f"{component['name']}/runtime_set")
+    run:
+        import time
+        from bifrostlib.datahandling import SampleComponent
+
+        with open(input.start_file) as fh:
+            t_start = float(fh.read().strip())
+        with open(input.end_file) as fh:
+            t_end = float(fh.read().strip())
+        with open(input.tool_version) as fh:
+            tool_version = str(fh.read().rstrip("\n"))
+        with open(input.git_hash) as fh:
+            git_hash = str(fh.read().strip())
+
+        runtime_minutes = (t_end - t_start) / 60.0
+        print(f"runtime in minutes {runtime_minutes}")
+
+        sc = SampleComponent.load(samplecomponent.to_reference())
+        sc["time_start"] = datetime.datetime.fromtimestamp(t_start).strftime("%Y-%m-%d %H:%M:%S")
+        sc["time_end"] = datetime.datetime.fromtimestamp(t_end).strftime("%Y-%m-%d %H:%M:%S")
+        sc["time_running"] = round(runtime_minutes, 3)
+        sc["tool_version"] = tool_version
+        sc["git_hash"] = git_hash
+
+        sc.save()
 
 # -------------------------------------------------------------------------
 # DATADUMP
@@ -176,12 +272,14 @@ rule datadump:
     benchmark:
         f"{component['name']}/benchmarks/{rule_name}.benchmark"
     input:
-        amr_report_file = rules.run_amrfinderplus_on_assembly.output.amr_report,
-        mutation_report_file = rules.run_amrfinderplus_on_assembly.output.mut_report
+        amr_report_file = rules.run_amrfinderplus.output.amr_report,
+        mutation_report_file = rules.run_amrfinderplus.output.mut_report,
+        runtime_flag = rules.dump_info.output.runtime_flag	
     output:
         complete = f"{component['name']}/datadump_complete"
     params:
-        samplecomponent_ref_json = samplecomponent.to_reference().json
+        samplecomponent_id = samplecomponent["_id"]
     script:
-        f"{resources_dir}/bifrost_amrfinderplus/datadump.py"
+        os.path.join(os.path.dirname(workflow.snakefile), "datadump.py")
+
 #- Templated section: end --------------------------------------------------------------------------

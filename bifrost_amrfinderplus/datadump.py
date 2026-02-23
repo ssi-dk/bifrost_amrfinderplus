@@ -26,8 +26,8 @@ def extract_results_from_tsv(AMRfinder_category: Category, results: Dict, file_n
         AMRfinder_category["summary"]["mutation"] = mutation_results
 
 # Main function to handle the datadump
-def datadump(input: object, output: object, samplecomponent_ref_json: Dict):
-    samplecomponent_ref = SampleComponentReference(value=samplecomponent_ref_json)
+def datadump(input: object, output: object, samplecomponent_id: str):
+    samplecomponent_ref = SampleComponentReference(_id=samplecomponent_id)
     samplecomponent = SampleComponent.load(samplecomponent_ref)
     sample = Sample.load(samplecomponent.sample)
     
@@ -74,5 +74,5 @@ def datadump(input: object, output: object, samplecomponent_ref_json: Dict):
 datadump(
     snakemake.input,
     snakemake.output,
-    snakemake.params.samplecomponent_ref_json,
+    snakemake.params.samplecomponent_id,
 )
