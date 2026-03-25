@@ -51,7 +51,10 @@ onerror:
 
 envvars:
     "BIFROST_INSTALL_DIR",
-    "CONDA_PREFIX"
+    "CONDA_PREFIX",
+    "BIFROST_CPUS_BIG",
+
+JOB_CPUS = int(os.environ.get("BIFROST_CPUS_BIG", 4))
 
 resources_dir = f"{os.environ['BIFROST_INSTALL_DIR']}/bifrost/components/bifrost_{component['display_name']}"
 
@@ -158,6 +161,7 @@ rule run_amrfinderplus:
         org = organism_option,
         amrfinder_db = f"{os.environ['BIFROST_INSTALL_DIR']}{component['resources']['amrfinderplus_db']}/latest",
         sample_name = sample["name"]
+    threads: JOB_CPUS
     shell:
         r"""
         amrfinder \
@@ -166,6 +170,7 @@ rule run_amrfinderplus:
             --database {params.amrfinder_db} \
             --name {params.sample_name} \
             --mutation_all {output.mut_report} \
+            --threads {threads} \
             --plus \
             --print_node \
             --report_all_equal \
