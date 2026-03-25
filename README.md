@@ -1,5 +1,5 @@
 # bifrost_amrfinderplus
-
+s
 This component is used to find acquired antimicrobial resistance genes and some point mutations in protein or assembled nucleotide sequences. The component is limited to a predefined set of species native to the utilized tool (described below). 
 
 ## Requirements
