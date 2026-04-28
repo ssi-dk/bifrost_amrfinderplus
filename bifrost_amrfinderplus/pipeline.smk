@@ -63,15 +63,11 @@ try:
             raise ValueError(f"Failed to parse YAML in '{config_file}': {e}")
     
     display_name = config_yaml.get("display_name")
-    #print(f"displau name {display_name}")
     amrfinderplus_organism_options = config_yaml.get("amrfinderplus_organism_option")
-    #print("AMRFinderPlus Options:", amrfinderplus_organism_options)
     
     for key, value in amrfinderplus_organism_options.items():
-        #print(f"key: {key} and value: {value}")
         if key.lower() == species_sp.lower():  #Case-insensitive match
             organism_options = value
-            #print(f"key: {key} and value: {value} and species {species} and subspecies sp {species_sp}")
             break
     
     if not organism_options:
@@ -96,6 +92,11 @@ try:
 except Exception as error:
     print(traceback.format_exc(), file=sys.stderr)
     raise Exception("failed to set sample, component and/or samplecomponent")
+
+if not samplecomponent.has_requirements():
+   common.set_status_and_save(sample, samplecomponent, "Requirements not met")
+   raise SystemExit("Requirements not met")
+
 
 onerror:
     if not samplecomponent.has_requirements():
@@ -125,29 +126,6 @@ rule setup:
         samplecomponent['path'] = os.path.join(os.getcwd(), component['name'])
         samplecomponent.save()
 
-rule_name = "check_requirements"
-rule check_requirements:
-    message:
-        f"Running step:{rule_name}"
-    log:
-        out_file = f"{component['name']}/log/{rule_name}.out.log",
-        err_file = f"{component['name']}/log/{rule_name}.err.log",
-    benchmark:
-        f"{component['name']}/benchmarks/{rule_name}.benchmark"
-    input:
-        folder = rules.setup.output.init_file,
-    output:
-        check_file = directory(f"{component['name']}/requirements_met"),
-    params:
-        samplecomponent
-    run:
-        requirements_met_dir = output.check_file
-        if not os.path.exists(requirements_met_dir):
-            os.makedirs(requirements_met_dir)
-        if samplecomponent.has_requirements():
-            with open(output.check_file, "w") as fh:
-                fh.write("")
-
 rule_name = "run_amrfinderplus_on_assembly"
 rule run_amrfinderplus_on_assembly:
     message:
@@ -158,7 +136,6 @@ rule run_amrfinderplus_on_assembly:
     benchmark:
         f"{component['name']}/benchmarks/{rule_name}.benchmark"
     input:
-        rules.check_requirements.output.check_file,
         assembly = f"{assemblatron_path}/{sample_id}.fasta",
     output:
         amr_report = f"{component['name']}/{component['name']}_amr_report.txt",
