@@ -45,7 +45,7 @@ conda activate $ENV_NAME
 AMR_DB_UPDATE_SCRIPT="$CONDA_ENV_PATH/bin/amrfinder_update"
 echo "update script $AMR_DB_UPDATE_SCRIPT"
 
-$CONDA_ENV_PATH/bin/amrfinder_update -d $CONDA_ENV_PATH/share/amrfinderplus/data 
+$CONDA_ENV_PATH/bin/amrfinder_update -d $SCRIPT_DIR/resources/amrfinderplus_db
 echo "$CONDA_ENV_PATH"
 echo "$CONDA_ENV_PATH/share/amrfinderplus/data"
 

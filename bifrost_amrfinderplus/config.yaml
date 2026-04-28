@@ -4,88 +4,75 @@ name: &name amrfinderplus__v1.0.0
 version:
   schema: ["v1.0.0"]
   code: v1.0.0
-#---------------------------------------------------------------------------------------------------
 
 #-Details-------------------------------------------------------------------------------------------
 details:
   target: [sample]
   description: >
-    This preforms an alignment using blast against AMRFinderPlus DB. 
-    AMRFinderPlus finds acquired antimicrobial resistance genes and some point mutations in protein 
-    or assembled nucleotide sequences.
-#---------------------------------------------------------------------------------------------------
+    This performs AMRFinderPlus analysis on assembled contigs to detect acquired AMR genes
+    and point mutations.
 
 #-Category info-------------------------------------------------------------------------------------
 category: [resistance]
-#---------------------------------------------------------------------------------------------------
 
 #-Install-------------------------------------------------------------------------------------------
 install:
-  path: # Set by install program
+  path:
   dockerfile: docker://ssidk/bifrost_amrfinderplus
-#---------------------------------------------------------------------------------------------------
 
 #-Options-------------------------------------------------------------------------------------------
-amrfinderplus_organism_option:
-  "Campylobacter": [Campylobacter]
-  "Campylobacter jejuni": [Campylobacter]
-  "Campylobacter coli": [Campylobacter]
-  "Campylobacter lari": [Campylobacter]
-  "Campylobacter upsaliensis": [Campylobacter]
-  "Campylobacter fetus": [Campylobacter]
-  "Campylobacter helveticus": [Campylobacter]
-  "Campylobacter sputorum": [Campylobacter]
-  "Campylobacter concisus": [Campylobacter]
-  "Campylobacter hyointestinalis": [Campylobacter]
-  "Escherichia": [Escherichia]
-  "Escherichia coli": [Escherichia]
-  "Shigella": [Escherichia]
-  "Shigella sonnei": [Escherichia]
-  "Shigella flexneri": [Escherichia]
-  "Shigella boydii": [Escherichia]
-  "Shigella dysenteriae": [Escherichia]
-  "Salmonella": [Salmonella]
-  "Salmonella enterica": [Salmonella]
-  "Salmonella bongori": [Salmonella]
-  "Clostridioides difficile": [Clostridioides_difficile]
-
-#---------------------------------------------------------------------------------------------------
+options:
+  amrfinderplus_organism_option:
+    "Campylobacter": [Campylobacter]
+    "Campylobacter jejuni": [Campylobacter]
+    "Campylobacter coli": [Campylobacter]
+    "Campylobacter lari": [Campylobacter]
+    "Campylobacter upsaliensis": [Campylobacter]
+    "Campylobacter fetus": [Campylobacter]
+    "Campylobacter helveticus": [Campylobacter]
+    "Campylobacter sputorum": [Campylobacter]
+    "Campylobacter concisus": [Campylobacter]
+    "Campylobacter hyointestinalis": [Campylobacter]
+    "Escherichia": [Escherichia]
+    "Escherichia coli": [Escherichia]
+    "Shigella": [Escherichia]
+    "Shigella sonnei": [Escherichia]
+    "Shigella flexneri": [Escherichia]
+    "Shigella boydii": [Escherichia]
+    "Shigella dysenteriae": [Escherichia]
+    "Salmonella": [Salmonella]
+    "Salmonella enterica": [Salmonella]
+    "Salmonella bongori": [Salmonella]
+    "Clostridioides difficile": [Clostridioides_difficile]
+    "Other": [Other]
 
 #-Required resource files---------------------------------------------------------------------------
 resources:
   amrfinderplus_db: "/bifrost/components/bifrost_amrfinderplus/resources/amrfinderplus_db"
-#---------------------------------------------------------------------------------------------------
 
 #-Requirements to run component---------------------------------------------------------------------
 requirements:
   sample:
     categories:
-      paired_reads:
+      contigs:
         summary:
           data:
-    components:
-      assemblatron:
-        status: Success
-      whats_my_species:
-        status: Success
 
-#---------------------------------------------------------------------------------------------------
-
-#-DB Value changes (excluding component output)-----------------------------------------------------
+#-DB Value changes----------------------------------------------------------------------------------
 db_values_changes:
   files: []
   sample:
     categories:
       resistance:
-        summary:  # see sample_component summary
+        summary:
         component:
-          _id: 
-          date:  # ObjectId
+          _id:
+          date:
     report:
       resistance:
         title: "Resistance"
         info: *name
-        columns: 
+        columns:
           - {id: "gene", name: "gene"}
           - {id: "coverage", name: "%cov"}
           - {id: "identity", name: "%id"}
@@ -93,8 +80,6 @@ db_values_changes:
         data: []
   sample_component:
     summary:
-      genes: 
+      genes:
     results:
       amrfinderplus/data_yaml: {}
-
-#---------------------------------------------------------------------------------------------------
