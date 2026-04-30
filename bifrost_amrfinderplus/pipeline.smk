@@ -104,22 +104,23 @@ def determine_species(sample, component):
 
 
 def map_species_to_amrfinder(species, component):
-    species_sp = species.split()[0]
+    genus = species.split()[0]
 
-    config_file = f"{os.environ['BIFROST_INSTALL_DIR']}/bifrost/components/bifrost_{component['display_name']}/bifrost_{component['display_name']}/config.yaml"
-    with open(config_file, "r") as f:
-        config_yaml = yaml.safe_load(f)
+    amr_opts = component["options"]["amrfinderplus_organism_option"]
+    # config_file = f"{os.environ['BIFROST_INSTALL_DIR']}/bifrost/components/bifrost_{component['display_name']}/bifrost_{component['display_name']}/config.yaml"
+    # with open(config_file, "r") as f:
+    #     config_yaml = yaml.safe_load(f)
 
-    amr_opts = config_yaml["options"]["amrfinderplus_organism_option"]
+    #amr_opts = config_yaml["options"]["amrfinderplus_organism_option"]
 
     organism_option = None
     for key, value in amr_opts.items():
-        if key.lower() == species_sp.lower():
+        if key.lower().startswith(genus.lower()):
             organism_option = value
             break
 
     if organism_option is None:
-        print(f"Species '{species_sp}' not found. Using 'Other'.")
+        print(f"Genus '{genus}' not found. Using 'Other'.")
         organism_option = amr_opts["Other"]
 
     print(f"AMRFinderPlus organism option: {organism_option}")
