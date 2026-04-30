@@ -2,7 +2,7 @@ from setuptools import setup, find_namespace_packages
 
 setup(
     name='bifrost_amrfinderplus',
-    version='1.0.0',
+    version='1.0.1',
     description='AMRfinder for Bifrost',
     url='https://github.com/ssi-dk/bifrost_amrfinderplus',
 
