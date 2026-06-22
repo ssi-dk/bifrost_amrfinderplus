@@ -104,6 +104,10 @@ def determine_species(sample, component):
 
 
 def map_species_to_amrfinder(species, component):
+    if not species:
+        print("No species found. Requirement not met.")
+        return None
+
     genus = species.split()[0]
 
     amr_opts = component["options"]["amrfinderplus_organism_option"]
@@ -113,22 +117,24 @@ def map_species_to_amrfinder(species, component):
 
     #amr_opts = config_yaml["options"]["amrfinderplus_organism_option"]
 
-    organism_option = None
+
     for key, value in amr_opts.items():
         if key.lower().startswith(genus.lower()):
-            organism_option = value
-            break
+            print(f"AMRFinderPlus organism option: {value}")
+            return value
 
-    if organism_option is None:
-        print(f"Genus '{genus}' not found. Using 'Other'.")
-        organism_option = amr_opts["Other"]
-
-    print(f"AMRFinderPlus organism option: {organism_option}")
-    return organism_option
+    print(f"Genus '{genus}' not found in amrfinderplus_organism_option. Requirement not met.")
+    return None
 
 
 species = determine_species(sample, component)
 organism_option = map_species_to_amrfinder(species, component)
+
+if organism_option is None:
+    common.set_status_and_save(sample, samplecomponent, "Requirements not met")
+    raise SystemExit("Requirements not met: genus not supported by AMRFinderPlus organism options")
+
+
 
 rule_name = "run_amrfinderplus"
 rule run_amrfinderplus:
